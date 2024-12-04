@@ -1,11 +1,13 @@
 open Core
 
 let calculate_total_distance l r =
-  let compare = Int.compare in
-  let l = List.sort l ~compare in
-  let r = List.sort r ~compare in
-  List.map2_exn l r ~f:(fun l r -> abs (l - r)) 
-  |> List.sum (module Int) ~f:Fn.id 
+  (* count number of instances *)
+  let counts = Hashtbl.create (module Int) in
+  List.iter r ~f:(fun i -> Hashtbl.incr counts i);
+  List.fold l ~init:0 ~f:(fun acc i -> 
+    match Hashtbl.find counts i with
+    | None -> acc
+    | Some c -> acc+(i*c))
   |> printf "%d\n"
 ;;
 
