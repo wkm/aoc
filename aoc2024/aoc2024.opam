@@ -5,7 +5,7 @@ description: "A longer description"
 maintainer: ["wkm"]
 authors: ["wkm"]
 license: "LICENSE"
-tags: ["topics" "to describe" "your" "project"]
+tags: [""]
 homepage: "https://github.com/wkm/aoc"
 doc: "https://url/to/documentation"
 bug-reports: "https://github.com/wkm/aoc/issues"
@@ -14,6 +14,8 @@ depends: [
   "dune" {>= "3.16"}
   "core"
   "async"
+  "ocaml-lsp-server"
+  "ocamlformat"
   "odoc" {with-doc}
 ]
 build: [
