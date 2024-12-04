@@ -5,11 +5,11 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github wkm/aoc))
 
-(authors "Author Name")
+(authors "wkm")
 
-(maintainers "Maintainer Name")
+(maintainers "wkm")
 
 (license LICENSE)
 
@@ -22,5 +22,3 @@
  (depends ocaml dune core async)
  (tags
   (topics "to describe" your project)))
-
-; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
