@@ -1,2 +1,6 @@
 (library
- (name aoc2024))
+ (name aoc2024)
+ (libraries core async)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))
