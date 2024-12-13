@@ -1,20 +1,29 @@
 open Core
 
-let read_integer_file fname =
-  let per_line line =
-    String.strip line
-    |> String.split ~on:' '
-    |> List.filter_map ~f:(function
-      | "" -> None
-      | s -> Some (Int.of_string s))
+let read_string string =
+  let per_line = function
+    | "" -> None
+    | line ->
+      String.strip line
+      |> String.split ~on:' '
+      |> List.filter_map ~f:(function
+        | "" | "\n" -> None
+        | s -> Some (Int.of_string s))
+      |> Option.some
   in
-  In_channel.read_lines fname |> List.map ~f:per_line
+  String.split_lines string |> List.filter_map ~f:per_line
+;;
+
+let read_integer_file fname = In_channel.read_all fname |> read_string
+
+let print_int_list_list l =
+  List.iter l ~f:(fun e -> List.sexp_of_t Int.sexp_of_t e |> print_s)
 ;;
 
 let%expect_test _ =
   let data = read_integer_file "/Users/wkm/Code/aoc/aoc2024/data/day2" in
   (* print first five lines *)
-  List.take data 5 |> List.iter ~f:(fun e -> List.sexp_of_t Int.sexp_of_t e |> print_s);
+  List.take data 5 |> print_int_list_list;
   [%expect
     {|
     (3 6 7 9 11 8)

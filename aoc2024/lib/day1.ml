@@ -11,25 +11,23 @@ let calculate_total_distance l r =
   |> printf "%d\n"
 ;;
 
-let command =
-  Command.basic
-    ~summary:"day1"
-    [%map_open.Command
-      let () = return () in
-      fun () ->
-        print_endline "AOC Day1";
-        let lines =
-          In_channel.input_all In_channel.stdin |> String.strip |> String.split_lines
-        in
-        (* parse each line  *)
-        let numbers =
-          List.filter_map lines ~f:(function
-            | "" | "\n" -> None
-            | line ->
-              Some (String.strip line |> Util.split_on_space |> List.map ~f:Int.of_string))
-        in
-        match List.transpose numbers with
-        | None -> print_endline "Error - could not transpose"
-        | Some [ l; r ] -> calculate_total_distance l r
-        | _ -> print_endline "Error - not two columns of numbers"]
+let%expect_test _ =
+  let d =
+    Util.read_string {|
+    3   4
+    4   3
+    2   5
+    1   3
+    3   9
+    3   3|}
+  in
+  Util.print_int_list_list d;
+  [%expect {|
+    (3 4)
+    (4 3)
+    (2 5)
+    (1 3)
+    (3 9)
+    (3 3)
+    |}]
 ;;
