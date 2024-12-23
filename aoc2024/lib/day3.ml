@@ -1,6 +1,6 @@
 open Core
 
-let sample_data =
+let part1_sample =
   {|xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))|}
 ;;
 
@@ -50,7 +50,7 @@ let parse_end = function
   | rst -> None, rst
 ;;
 
-let parse_once code =
+let parse_mult code =
   match parse_mul code with
   | None, rst -> None, rst
   | Some (), rst ->
@@ -68,9 +68,9 @@ let parse_once code =
               | Some (), rst -> Some (lhs * rhs), rst))))
 ;;
 
-let parse_all code =
+let parse_all_mults code =
   let rec step acc rst =
-    match parse_once rst with
+    match parse_mult rst with
     | None, [] | None, [ _ ] -> acc
     | None, _ :: rst -> step acc rst
     | Some i, rst -> step (acc + i) rst
@@ -78,8 +78,8 @@ let parse_all code =
   step 0 code
 ;;
 
-let%expect_test "parsing" =
-  parse_all (sample_data |> String.to_list) |> printf "%d\n";
+let%expect_test "part 1 test" =
+  parse_all_mults (part1_sample |> String.to_list) |> printf "%d\n";
   [%expect {| 161 |}]
 ;;
 
@@ -87,6 +87,62 @@ let%expect_test "part 1 submittal" =
   let data =
     In_channel.read_all "/Users/wkm/Code/aoc/aoc2024/data/day3" |> String.to_list
   in
-  parse_all data |> printf "%d\n";
+  parse_all_mults data |> printf "%d\n";
   [%expect {| 187825547 |}]
+;;
+
+module State = struct
+  type t =
+    { count : int
+    ; enabled : bool
+    }
+  [@@deriving sexp]
+
+  let initial = { count = 0; enabled = true }
+end
+
+let parse_enabled = function
+  | 'd' :: 'o' :: '(' :: ')' :: rst -> Some (), rst
+  | rst -> None, rst
+;;
+
+let parse_disabled = function
+  | 'd' :: 'o' :: 'n' :: '\'' :: 't' :: '(' :: ')' :: rst -> Some (), rst
+  | rst -> None, rst
+;;
+
+let parse_all_mults_and_states code =
+  let initial = State.initial in
+  let rec step (s : State.t) rst =
+    match parse_enabled rst with
+    | Some (), rst -> step { s with enabled = true } rst
+    | None, rst ->
+      (match parse_disabled rst with
+       | Some (), rst -> step { s with enabled = false } rst
+       | None, rst ->
+         (match parse_mult rst with
+          | Some count, rst when s.enabled -> step { s with count = s.count + count } rst
+          | Some _, rst -> step s rst
+          | None, _ :: rst -> step s rst
+          | None, [] -> s))
+  in
+  let { State.count; _ } = step initial code in
+  count
+;;
+
+let part2_sample =
+  {|xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))|}
+;;
+
+let%expect_test "part 2 test" =
+  parse_all_mults_and_states (part2_sample |> String.to_list) |> printf "%d\n";
+  [%expect {| 48 |}]
+;;
+
+let%expect_test "part 2 submittal" =
+  let data =
+    In_channel.read_all "/Users/wkm/Code/aoc/aoc2024/data/day3" |> String.to_list
+  in
+  parse_all_mults_and_states data |> printf "%d\n";
+  [%expect {| 85508223 |}]
 ;;
